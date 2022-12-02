@@ -8,10 +8,27 @@ jobs:
   dagger_build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - name: Dagger set up
+        run: |
+          sudo apt-get update && sudo apt-get install -y \
+          ca-certificates \
+          curl \
+          gnupg \
+          lsb-release
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update ; sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+          curl -L https://dl.dagger.io/dagger-cue/install.sh | BIN_DIR=/tmp/bin sh
+          sudo mv /tmp/bin/dagger-cue /usr/local/bin && sudo chmod +x /usr/local/bin
       - name: Dagger build
-        uses: dagger/dagger-for-github@v3
-        with:
-          version: latest
-          cmds: version
+        run: dagger-cue do build
+      - name: Dagger test
+        run: dagger-cue do test
+          
+
 
 
