@@ -1,11 +1,11 @@
-name: dummy
+name: build_native
 
 on:
   push:
     branches: ["main"]
 
 jobs:
-  build:
+  native_build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
